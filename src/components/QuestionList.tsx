@@ -1,16 +1,12 @@
 "use client"
 import React, { useState, useEffect } from "react";
 import Question from "./Questions";
-import { usernameState, passwordState } from "../atoms/credentials";
-import { useRecoilValue } from "recoil";
 
 interface QuestionListProps {}
 
 const QuestionList: React.FC<QuestionListProps> = () => {
-  const [questions, setQuestions] = useState<{ id: number; text: string; upvotes: number }[]>([]);
+  const [questions, setQuestions] = useState<{ _id: string; text: string; upvotes: number }[]>([]);
   const [newQuestion, setNewQuestion] = useState("");
-  const username = useRecoilValue(usernameState);
-  const password = useRecoilValue(passwordState);
 
   useEffect(() => {
     fetch("/api/questions")
@@ -19,10 +15,6 @@ const QuestionList: React.FC<QuestionListProps> = () => {
   }, []);
 
   const handleAddQuestion = () => {
-    if (username !== process.env.NEXT_PUBLIC_ID || password !== process.env.NEXT_PUBLIC_PASSWORD) {
-      alert("You are not admin");
-      return;
-    }
     if (newQuestion.trim() === "") return;
     fetch("/api/questions", {
       method: "POST",
@@ -38,7 +30,7 @@ const QuestionList: React.FC<QuestionListProps> = () => {
       });
   };
 
-  const handleUpvote = (id: number) => {
+  const handleUpvote = (id: string) => {
     fetch(`/api/questions/${id}`, {
       method: "POST",
       headers: {
@@ -47,13 +39,13 @@ const QuestionList: React.FC<QuestionListProps> = () => {
     })
       .then(() => {
         const updatedQuestions = questions.map((q) =>
-          q.id === id ? { ...q, upvotes: q.upvotes + 1 } : q
+          q._id === id ? { ...q, upvotes: q.upvotes + 1 } : q
         );
         setQuestions(updatedQuestions);
       });
   };
 
-  const handleDeleteQuestion = (id: number) => {
+  const handleDeleteQuestion = (id: string) => {
     fetch("/api/questions", {
       method: "DELETE",
       headers: {
@@ -62,7 +54,7 @@ const QuestionList: React.FC<QuestionListProps> = () => {
       body: JSON.stringify({ id }),
     })
       .then(() => {
-        setQuestions(questions.filter((q) => q.id !== id));
+        setQuestions(questions.filter((q) => q._id !== id));
       });
   };
 
@@ -80,9 +72,9 @@ const QuestionList: React.FC<QuestionListProps> = () => {
       </div>
       <div>
         {questions.map((question) => (
-          <div key={question.id}>
+          <div key={question._id}>
             <Question question={question} onUpvote={handleUpvote} />
-            <button onClick={() => handleDeleteQuestion(question.id)}>Delete</button>
+            <button onClick={() => handleDeleteQuestion(question._id)}>Delete</button>
           </div>
         ))}
       </div>

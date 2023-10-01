@@ -1,22 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
+import {QUESTION} from "../../../Db/model";
+import { DbConnect } from "@/Db/Db";
 
-let questions: { id: number; text: string; upvotes: number }[] = [];
-
+DbConnect();
 export async function GET(req: NextRequest, res: NextResponse){
+    try {
+    const questions = await QUESTION.find();
     return NextResponse.json(questions, { status: 200 });
+    } catch (error) {
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
 }
 
 export async function POST(req: NextRequest, res: NextResponse){
+    try {
     const { text } = await req.json();
-    const newQuestion = { id: questions.length + 1, text, upvotes: 0 };
-    questions.push(newQuestion);
-
+    const newQuestion = new QUESTION({ text });
+      await newQuestion.save();
     return NextResponse.json(newQuestion,{ status: 201 });
+    }
+    catch (error) {
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
   }
 
   export async function DELETE(req: NextRequest, res: NextResponse){
+    try {
     const { id } =await req.json();
-    questions = questions.filter((q) => q.id !== id);
+    await QUESTION.deleteOne({ _id: id })
 
     return NextResponse.json({ status: 204 });
+    }
+    catch (error) {
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
   }

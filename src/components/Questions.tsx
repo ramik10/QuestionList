@@ -2,15 +2,15 @@
 import React from "react";
 
 interface QuestionProps {
-  question: { id: number; text: string; upvotes: number };
-  onUpvote: (id: number) => void;
+  question: { _id: string; text: string; upvotes: number };
+  onUpvote: (_id: string) => void;
 }
 
 const Question: React.FC<QuestionProps> = ({ question, onUpvote }) => {
-  const { id, text, upvotes } = question;
+  const { _id, text, upvotes } = question;
 
   const handleUpvote = () => {
-    onUpvote(id);
+    onUpvote(_id);
   };
 
   return (
