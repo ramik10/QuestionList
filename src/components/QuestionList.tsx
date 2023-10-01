@@ -1,12 +1,16 @@
 "use client"
 import React, { useState, useEffect } from "react";
 import Question from "./Questions";
+import { useRecoilValue } from "recoil";
+import { usernameState, passwordState } from "../atoms/credentials";
 
 interface QuestionListProps {}
 
 const QuestionList: React.FC<QuestionListProps> = () => {
   const [questions, setQuestions] = useState<{ _id: string; text: string; upvotes: number }[]>([]);
   const [newQuestion, setNewQuestion] = useState("");
+  const username = useRecoilValue(usernameState);
+  const password = useRecoilValue(passwordState);
 
   useEffect(() => {
     fetch("/api/questions")
@@ -15,6 +19,10 @@ const QuestionList: React.FC<QuestionListProps> = () => {
   }, []);
 
   const handleAddQuestion = () => {
+    if (username !== process.env.NEXT_PUBLIC_ID || password !== process.env.NEXT_PUBLIC_PASSWORD) {
+      alert("Not an admin");
+      return;
+    }
     if (newQuestion.trim() === "") return;
     fetch("/api/questions", {
       method: "POST",
@@ -46,6 +54,10 @@ const QuestionList: React.FC<QuestionListProps> = () => {
   };
 
   const handleDeleteQuestion = (id: string) => {
+    if (username !== process.env.NEXT_PUBLIC_ID || password !== process.env.NEXT_PUBLIC_PASSWORD) {
+      alert("Not an admin");
+      return;
+    }
     fetch("/api/questions", {
       method: "DELETE",
       headers: {
