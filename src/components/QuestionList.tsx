@@ -13,9 +13,11 @@ const QuestionList: React.FC<QuestionListProps> = () => {
   const password = useRecoilValue(passwordState);
 
   useEffect(() => {
+    setInterval(() => {
     fetch("/api/questions")
       .then((response) => response.json())
       .then((data) => setQuestions(data));
+    }, 300);
   }, []);
 
   const handleAddQuestion = () => {
