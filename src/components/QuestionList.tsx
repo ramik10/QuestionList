@@ -1,17 +1,17 @@
 "use client"
 import React, { useState, useEffect } from "react";
 import Question from "./Questions";
-import { useRecoilValue } from "recoil";
-import { usernameState, passwordState } from "../atoms/credentials";
+import { useSession } from "next-auth/react";
 
-interface QuestionListProps {}
 
-const QuestionList: React.FC<QuestionListProps> = () => {
+interface QuestionListProps {
+  userId: string; 
+}
+
+const QuestionList: React.FC<QuestionListProps> = ({ userId }) => {
   const [questions, setQuestions] = useState<{ _id: string; text: string; upvotes: number }[]>([]);
   const [newQuestion, setNewQuestion] = useState("");
-  const username = useRecoilValue(usernameState);
-  const password = useRecoilValue(passwordState);
-
+  const session = useSession();
   useEffect(() => {
     setInterval(() => {
     fetch("/api/questions")
@@ -21,8 +21,8 @@ const QuestionList: React.FC<QuestionListProps> = () => {
   }, []);
 
   const handleAddQuestion = () => {
-    if (username !== process.env.NEXT_PUBLIC_ID || password !== process.env.NEXT_PUBLIC_PASSWORD) {
-      alert("Not an admin");
+    if(session.data?.user?.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL){
+      alert("You are not authorized to add questions)");
       return;
     }
     if (newQuestion.trim() === "") return;
@@ -41,11 +41,16 @@ const QuestionList: React.FC<QuestionListProps> = () => {
   };
 
   const handleUpvote = (id: string) => {
+    if(!session.data){
+      alert("Login to upvote questions)");
+      return;
+    }
     fetch(`/api/questions/${id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({ userId }), 
     })
       .then(() => {
         const updatedQuestions = questions.map((q) =>
@@ -56,8 +61,8 @@ const QuestionList: React.FC<QuestionListProps> = () => {
   };
 
   const handleDeleteQuestion = (id: string) => {
-    if (username !== process.env.NEXT_PUBLIC_ID || password !== process.env.NEXT_PUBLIC_PASSWORD) {
-      alert("Not an admin");
+    if(session.data?.user?.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL){
+      alert("You are not authorized to delete questions)");
       return;
     }
     fetch("/api/questions", {
