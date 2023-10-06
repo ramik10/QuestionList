@@ -1,4 +1,7 @@
-/* @tailwind base;
+@tailwind base;
 @tailwind components;
-@tailwind utilities; */
+@tailwind utilities;
 
+:root{
+    background-color:#c4f1be;
+}

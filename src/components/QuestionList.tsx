@@ -78,26 +78,28 @@ const QuestionList: React.FC<QuestionListProps> = ({ userId }) => {
   };
 
   return (
-    <div>
-      <h2>Admin Panel</h2>
-      <div>
-        <input
+    <div className="pt-3">
+      <h1 className="text-5xl font-bold flex justify-center">Admin Panel</h1>
+      <div className="flex justify-center pt-2">
+        <input className="border-2 border-[#731dd8] rounded-full p-1 bg-lime-600 placeholder-black"
           type="text"
           placeholder="Add a question"
           value={newQuestion}
           onChange={(e) => setNewQuestion(e.target.value)}
         />
-        <button onClick={handleAddQuestion}>Add</button>
+        <button className="bg-[#731dd8] rounded-full px-2 py-1 text-[#c4f1be]" onClick={handleAddQuestion}>Add</button>
       </div>
-      <div>
+      <div className="grid grid-cols-12 gap-6 ml-5 mr-5 pt-5">
         {questions.map((question) => (
-          <div key={question._id}>
-            <Question question={question} onUpvote={handleUpvote} />
-            <button onClick={() => handleDeleteQuestion(question._id)}>Delete</button>
+          <div className="col-span-12 md:col-span-6 lg:col-span-4 xl:col-span-3"   key={question._id}>
+            <Question  question={question} onUpvote={handleUpvote} />
+            <div className="flex justify-center pt-1">
+            <button className="bg-[#731dd8] rounded-full px-2 py-1 text-[#c4f1be]" onClick={() => handleDeleteQuestion(question._id)}>Delete</button>
+            </div>
           </div>
         ))}
       </div>
-    </div>
+      </div>
   );
 };
 
